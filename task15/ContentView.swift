@@ -7,10 +7,107 @@
 
 import SwiftUI
 
+struct Task: Identifiable {
+    var id = UUID()
+    var name: String
+    var isDone: Bool
+}
+
 struct ContentView: View {
+
+    @State private var tasks: [Task] = [
+        .init(name: "りんご", isDone: false),
+        .init(name: "みかん", isDone: true),
+        .init(name: "バナナ", isDone: false),
+        .init(name: "パイナップル", isDone: true)
+    ]
+
+    @State private var isShowModal = false
+
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            VStack {
+                List {
+                    ForEach(tasks) { task in
+                        HStack {
+                            CheckViewRow(task: task)
+                        }
+                    }
+                }
+                .navigationBarItems(trailing: Button(action: {
+                    isShowModal = true
+                }) {
+                    Text("+")
+                        .font(.largeTitle)
+                })
+            }
+        }
+        .sheet(isPresented: $isShowModal, content: {
+            TaskDetialView(
+                didTapSave: { name in
+                    guard !name.isEmpty else { return }
+                    tasks.append(Task(name: name, isDone: false))
+                    isShowModal = false
+                },
+                didTapCancel: {
+                    isShowModal = false
+                }
+            )
+        })
+    }
+}
+
+struct TaskDetialView: View {
+
+
+    @State private var name: String = ""
+
+    let didTapSave: (String) -> Void
+    let didTapCancel: () -> Void
+
+    var body: some View {
+        VStack {
+            HStack {
+                Button("Cancel") {
+                    didTapCancel()
+                }
+                Spacer()
+                Button("Save") {
+                    didTapSave(name)
+                }
+            }.padding()
+
+            HStack {
+                Text("名前")
+                TextField("", text: $name)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .frame(width: 100)
+            }
+            Spacer()
+        }
+    }
+}
+
+
+struct CheckViewRow: View {
+    @State var task: Task
+
+    var body: some View {
+
+        Button(action: {
+            task.isDone.toggle()
+        }) {
+            if task.isDone {
+                Image(systemName: "checkmark")
+                    .foregroundColor(.red)
+            } else {
+                Image(systemName: "checkmark")
+                    .hidden()
+            }
+        }
+
+        Text(task.name)
+        Spacer()
     }
 }
 

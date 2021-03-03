@@ -28,9 +28,9 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 List {
-                    ForEach(tasks) { task in
+                    ForEach(tasks.indices, id: \.self) { index in
                         HStack {
-                            CheckViewRow(task: task)
+                            CheckViewRow(task: $tasks[index])
                         }
                     }
                 }
@@ -90,7 +90,7 @@ struct TaskDetialView: View {
 
 
 struct CheckViewRow: View {
-    @State var task: Task
+    @Binding var task: Task
 
     var body: some View {
 

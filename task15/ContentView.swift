@@ -15,7 +15,7 @@ struct Task: Identifiable {
 
 struct ContentView: View {
 
-    @State private var tasks: [Task] = [
+    @State  var tasks: [Task] = [
         .init(name: "りんご", isDone: false),
         .init(name: "みかん", isDone: true),
         .init(name: "バナナ", isDone: false),
@@ -28,9 +28,9 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 List {
-                    ForEach(tasks) { task in
+                    ForEach(tasks.indices, id: \.self) { index in
                         HStack {
-                            CheckViewRow(task: task)
+                            CheckViewRow(task: $tasks[index])
                         }
                     }
                 }
@@ -57,8 +57,30 @@ struct ContentView: View {
     }
 }
 
-struct TaskDetialView: View {
+struct CheckViewRow: View {
+    @Binding var task: Task
 
+    var body: some View {
+
+        Button(action: {
+            task.isDone.toggle()
+        }) {
+            if task.isDone {
+                Image(systemName: "checkmark")
+                    .foregroundColor(.red)
+            } else {
+                Image(systemName: "checkmark")
+                    .hidden()
+            }
+        }
+
+        Text(task.name)
+        Spacer()
+    }
+}
+
+
+struct TaskDetialView: View {
 
     @State private var name: String = ""
 
@@ -89,27 +111,6 @@ struct TaskDetialView: View {
 }
 
 
-struct CheckViewRow: View {
-    @State var task: Task
-
-    var body: some View {
-
-        Button(action: {
-            task.isDone.toggle()
-        }) {
-            if task.isDone {
-                Image(systemName: "checkmark")
-                    .foregroundColor(.red)
-            } else {
-                Image(systemName: "checkmark")
-                    .hidden()
-            }
-        }
-
-        Text(task.name)
-        Spacer()
-    }
-}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
